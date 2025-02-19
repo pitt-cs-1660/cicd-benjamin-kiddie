@@ -5,7 +5,8 @@ WORKDIR /app
 
 RUN pip install --upgrade pip && pip install poetry
 
-COPY ./pyproject.toml ./poetry.lock ./
+COPY cc_compose ./cc_compose
+COPY pyproject.toml poetry.lock ./
 
 RUN poetry config virtualenvs.create true \
     && poetry config virtualenvs.in-project true \
@@ -18,11 +19,8 @@ WORKDIR /app
 
 COPY --from=builder /app /app
 
-ENV PATH="/app/.venv/bin:$PATH"
-
-COPY ./entrypoint.sh ./
+ENV PATH="$PATH:/app/.venv/bin"
 
 EXPOSE 8000
 
-ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["uvicorn", "cc_compose.server:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
